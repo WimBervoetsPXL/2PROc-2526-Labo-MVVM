@@ -38,9 +38,9 @@
                HorizontalOptions="Center" 
                Margin="0,0,0,20" />
 
-        <!-- Entry for New To-Do -->
-        <Grid ColumnDefinitions="*,Auto">
-            <Entry x:Name="NewToDoEntry"
+
+        <Grid>
+            <!--<Entry x:Name="NewToDoEntry"
                    Placeholder="Enter a new to-do..."
                    Text="{Binding NewTodoTitle}">
                 <Entry.Behaviors>
@@ -50,39 +50,42 @@
                         Flags="ValidateOnValueChanged"
                         MinimumLength="10" />
                 </Entry.Behaviors>
-            </Entry>
-            <Button Grid.Column="1" CornerRadius="45" Padding="0" Text="+" 
-                    Command="{Binding AddTodoCommand}"/>
-        </Grid>
+            </Entry>-->
 
-        <!-- List of To-Dos -->
-        <CollectionView ItemsSource="{Binding TodoItems}">
-            <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="m:TodoItem">
+            <!-- List of To-Dos -->
+            <CollectionView ItemsSource="{Binding TodoItems}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="m:TodoItem">
 
-                    <SwipeView>
-                        <SwipeView.LeftItems>
-                            <SwipeItems>
-                                <SwipeItem mi:MauiIcon.Value="{mi:FluentFilled Icon=Delete32Filled, IconSize=Large, IconColor={StaticResource Primary}}"
+                        <SwipeView>
+                            <SwipeView.LeftItems>
+                                <SwipeItems>
+                                    <SwipeItem mi:MauiIcon.Value="{mi:FluentFilled Icon=Delete32Filled, IconSize=Large, IconColor={StaticResource Primary}}"
                                     BackgroundColor="LightCoral"
                                     Command="{Binding Source={RelativeSource AncestorType={x:Type vm:TodoListViewModel}},Path=DeleteTodoCommand}"
                                     CommandParameter="{Binding .}" />
-                            </SwipeItems>
-                        </SwipeView.LeftItems>
+                                </SwipeItems>
+                            </SwipeView.LeftItems>
 
-                        <Grid ColumnDefinitions="Auto,*">
-                            <CheckBox IsChecked="{Binding IsCompleted}" />
-                            <Label Grid.Column="1" 
+                            <Grid ColumnDefinitions="Auto,*">
+                                <CheckBox IsChecked="{Binding IsCompleted}" />
+                                <Label Grid.Column="1" 
                             Text="{Binding Title}" 
                             VerticalOptions="Center"
                             Margin="10,0,0,0" 
                             TextDecorations="{Binding IsCompleted, 
                                 Converter={StaticResource CompletedTextDecorationConverter}}"/>
-                        </Grid>
+                            </Grid>
 
-                    </SwipeView>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
+                        </SwipeView>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <Button CornerRadius="45" Padding="0" Text="+" 
+                    Command="{Binding AddTodoCommand}" VerticalOptions="End" HorizontalOptions="End"/>
+        </Grid>
+
+
     </VerticalStackLayout>
 </ContentPage>

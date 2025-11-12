@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -8,17 +9,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Todo.UI.Messages;
 using Todo.UI.Models;
+using Todo.UI.Pages;
+using Todo.UI.Repositories;
 
 namespace Todo.UI.ViewModels
 {
-    public partial class TodoListViewModel : ObservableObject // : INotifyPropertyChanged
+    public partial class TodoListViewModel : ObservableObject, IRecipient<TodoItemAdded> // : INotifyPropertyChanged
     {
         [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(AddTodoCommand))]
         private string _newTodoTitle = "";
 
         private ObservableCollection<TodoItem> _todoItems;
+
 
         //public void OnPropertyChanged(string propertyName)
         //{
@@ -52,9 +57,14 @@ namespace Todo.UI.ViewModels
             }
         }
 
-        public TodoListViewModel()
+        private readonly ITodoRepository _repository;
+
+        public TodoListViewModel(ITodoRepository repository, IMessenger messenger)
         {
             this.TodoItems = new ObservableCollection<TodoItem>();
+            _repository = repository;
+
+            messenger.Register<TodoItemAdded>(this);
 
             //TODO: Initialise commands:
             //AddTodoCommand = new Command(AddTodo);
@@ -69,18 +79,21 @@ namespace Todo.UI.ViewModels
             return false;
         }
 
-        [RelayCommand(CanExecute = nameof(CanAddTodo))]
-        private void AddTodo()
+        //[RelayCommand(CanExecute = nameof(CanAddTodo))]
+        [RelayCommand]
+        private async Task AddTodo()
         {
             //TODO: add item to TodoItems, use NewTodoTitle as Title for the new item
             //TODO: clear the NewTodoTitle
 
-            TodoItem newItem = new TodoItem();
-            newItem.Title = this.NewTodoTitle;
+            //TodoItem newItem = new TodoItem();
+            //newItem.Title = this.NewTodoTitle;
 
-            this.TodoItems.Add(newItem);
+            //this.TodoItems.Add(newItem);
 
-            this.NewTodoTitle = string.Empty;
+            //this.NewTodoTitle = string.Empty;
+
+            await Shell.Current.GoToAsync(nameof(TodoDetailPage));
         }
 
         [RelayCommand]
@@ -91,15 +104,21 @@ namespace Todo.UI.ViewModels
         }
 
         [RelayCommand]
-        private void LoadData()
+        private async Task LoadData()
         {
-            foreach (TodoItem item in Data.TodoDb.GetTodoItems(10))
+            if(!TodoItems.Any())
             {
-                TodoItems.Add(item);
+                List<TodoItem> items = await _repository.GetTodoItems(10);
+                foreach (TodoItem item in items)
+                {
+                    TodoItems.Add(item);
+                }
             }
         }
 
-        
-
+        public void Receive(TodoItemAdded message)
+        {
+            TodoItems.Add(message.Value);
+        }
     }
 }
